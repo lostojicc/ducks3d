@@ -144,6 +144,10 @@
     <ClInclude Include="utility\shader\Shader.h" />
     <ClInclude Include="utility\texture\Texture2D.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\shaders\basic.frag" />
+    <None Include="resources\shaders\basic.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
