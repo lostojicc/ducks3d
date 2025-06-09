@@ -112,7 +112,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;glfw3.lib;opengl32.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,11 +135,15 @@
     <ClCompile Include="Ducks3D.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="utility\model-loading\Mesh.cpp" />
+    <ClCompile Include="utility\model-loading\Model.cpp" />
     <ClCompile Include="utility\ResourceManager.cpp" />
     <ClCompile Include="utility\shader\Shader.cpp" />
     <ClCompile Include="utility\texture\Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="utility\model-loading\Mesh.h" />
+    <ClInclude Include="utility\model-loading\Model.h" />
     <ClInclude Include="utility\ResourceManager.h" />
     <ClInclude Include="utility\shader\Shader.h" />
     <ClInclude Include="utility\texture\Texture2D.h" />

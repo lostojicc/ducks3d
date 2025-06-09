@@ -11,6 +11,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "utility/ResourceManager.h"
+#include "utility/model-loading/Model.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -139,6 +140,10 @@ int main() {
     ResourceManager::loadShader("resources/shaders/basic.vert", "resources/shaders/basic.frag", nullptr, "shader");
     ResourceManager::loadTexture("resources/textures/grass.jpg", false, "grass");
     ResourceManager::loadTexture("resources/textures/water.jpg", false, "water");
+    ResourceManager::loadTexture("resources/textures/chicken.png", true, "chicken");
+
+
+    Model duck("resources/models/chicken.obj");
 
     glEnable(GL_DEPTH_TEST);
  
@@ -190,6 +195,10 @@ int main() {
         glBindVertexArray(lakeVAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, segments + 2);
         glBindVertexArray(0);
+
+        glActiveTexture(GL_TEXTURE0);
+        ResourceManager::getTexture("chicken").Bind();
+        duck.Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
