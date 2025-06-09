@@ -1,4 +1,9 @@
+#define _USE_MATH_DEFINES
+
 #include <iostream>
+#include <vector>
+#include <cmath>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -79,8 +84,51 @@ int main() {
 
     glBindVertexArray(0);
 
+    std::vector<float> lakeVertices;
+    const int segments = 128;
+    const float radius = 25.0f;
+    const float y = 0.1f; // slight elevation to prevent z-fighting
+    const float tileFactor = 10.0f; // how many times texture repeats across the lake
+
+    // Center vertex
+    lakeVertices.push_back(0.0f); // x
+    lakeVertices.push_back(y);    // y
+    lakeVertices.push_back(0.0f); // z
+    lakeVertices.push_back(tileFactor * 0.5f); // u
+    lakeVertices.push_back(tileFactor * 0.5f); // v
+
+    for (int i = 0; i <= segments; ++i) {
+        float angle = 2.0f * M_PI * i / segments;
+        float x = radius * cos(angle);
+        float z = radius * sin(angle);
+        lakeVertices.push_back(x);
+        lakeVertices.push_back(y);
+        lakeVertices.push_back(z);
+        lakeVertices.push_back(tileFactor * (0.5f + 0.5f * cos(angle))); // u
+        lakeVertices.push_back(tileFactor * (0.5f + 0.5f * sin(angle))); // v
+    }
+
+    GLuint lakeVAO, lakeVBO;
+    glGenVertexArrays(1, &lakeVAO);
+    glGenBuffers(1, &lakeVBO);
+
+    glBindVertexArray(lakeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, lakeVBO);
+    glBufferData(GL_ARRAY_BUFFER, lakeVertices.size() * sizeof(float), lakeVertices.data(), GL_STATIC_DRAW);
+
+    // Position attribute (3 floats)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Texture coordinates attribute (2 floats)
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+
     ResourceManager::loadShader("resources/shaders/basic.vert", "resources/shaders/basic.frag", nullptr, "shader");
     ResourceManager::loadTexture("resources/textures/grass.jpg", false, "grass");
+    ResourceManager::loadTexture("resources/textures/water.jpg", false, "water");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -105,10 +153,16 @@ int main() {
 
         glActiveTexture(GL_TEXTURE0);
         ResourceManager::getTexture("grass").Bind();
-        ResourceManager::getShader("shader").SetInteger("_texture", 0);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glActiveTexture(GL_TEXTURE0);
+        ResourceManager::getTexture("water").Bind();
+
+        glBindVertexArray(lakeVAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, segments + 2);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
