@@ -13,7 +13,17 @@
 #include "utility/ResourceManager.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow* window);
+
+const float CAMERA_SPEED = 1.5;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+float cameraZoom = 150.0f;
+float cameraAngle = 0.0f;
+float cameraElevation = glm::radians(45.0f); 
 
 int main() {
     if (!glfwInit()) {
@@ -42,17 +52,17 @@ int main() {
         return -1;
     }
 
-    glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     glViewport(0, 0, mode->width, mode->height);
 
     float planeVertices[] = {
         // positions          // tex coords
-        -50.0f, 0.0f, -50.0f,  0.0f, 0.0f,  // 0
-         50.0f, 0.0f, -50.0f,  10.0f, 0.0f, // 1
-         50.0f, 0.0f,  50.0f,  10.0f, 10.0f,// 2
-        -50.0f, 0.0f,  50.0f,  0.0f, 10.0f  // 3
+        -200.0f, 0.0f, -200.0f,  0.0f, 0.0f,  // 0
+         200.0f, 0.0f, -200.0f,  20.0f, 0.0f, // 1
+         200.0f, 0.0f,  200.0f,  20.0f, 20.0f,// 2
+        -200.0f, 0.0f,  200.0f,  0.0f, 20.0f  // 3
     };
 
     unsigned int indices[] = {
@@ -85,10 +95,10 @@ int main() {
     glBindVertexArray(0);
 
     std::vector<float> lakeVertices;
-    const int segments = 128;
-    const float radius = 25.0f;
+    const int segments = 64;
+    const float radius = 50.0f;
     const float y = 0.1f; // slight elevation to prevent z-fighting
-    const float tileFactor = 10.0f; // how many times texture repeats across the lake
+    const float tileFactor = 5.0f; // how many times texture repeats across the lake
 
     // Center vertex
     lakeVertices.push_back(0.0f); // x
@@ -131,16 +141,33 @@ int main() {
     ResourceManager::loadTexture("resources/textures/water.jpg", false, "water");
 
     glEnable(GL_DEPTH_TEST);
+ 
+    glm::vec3 cameraPos;
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        processInput(window);
+
         glm::mat4 model = glm::mat4(1.0f);
+        
+        // Spherical to Cartesian
+        float x = sin(cameraElevation) * sin(cameraAngle) * cameraZoom;
+        float y = cos(cameraElevation) * cameraZoom;
+        float z = sin(cameraElevation) * cos(cameraAngle) * cameraZoom;
+
+        cameraPos = glm::vec3(x, y, z);
+
         glm::mat4 view = glm::lookAt(
-            glm::vec3(150.0f, 150.0f, 150.0f), 
-            glm::vec3(0.0f, 0.0f, 0.0f),    
-            glm::vec3(0.0f, 1.0f, 0.0f)     
+            cameraPos,             
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f) 
         );
+
         glm::mat4 projection = glm::perspective(
             glm::radians(45.0f),
             800.0f / 600.0f,
@@ -173,11 +200,26 @@ int main() {
     return 0;
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    float cameraSpeed = CAMERA_SPEED * deltaTime;
+    
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraAngle -= cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraAngle += cameraSpeed;      
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    cameraZoom -= (float)yoffset;
+    if (cameraZoom < 1.0f)
+        cameraZoom = 1.0f;
+    if (cameraZoom > 150.0f)
+        cameraZoom = 150.0f;
 }
