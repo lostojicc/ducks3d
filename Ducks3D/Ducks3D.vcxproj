@@ -134,6 +134,15 @@
   <ItemGroup>
     <ClCompile Include="Ducks3D.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="utility\ResourceManager.cpp" />
+    <ClCompile Include="utility\shader\Shader.cpp" />
+    <ClCompile Include="utility\texture\Texture2D.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="utility\ResourceManager.h" />
+    <ClInclude Include="utility\shader\Shader.h" />
+    <ClInclude Include="utility\texture\Texture2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
