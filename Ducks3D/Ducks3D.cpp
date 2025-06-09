@@ -95,7 +95,7 @@ int main() {
     glBindVertexArray(0);
 
     std::vector<float> lakeVertices;
-    const int segments = 64;
+    const int segments = 50;
     const float radius = 50.0f;
     const float y = 0.1f; // slight elevation to prevent z-fighting
     const float tileFactor = 5.0f; // how many times texture repeats across the lake
