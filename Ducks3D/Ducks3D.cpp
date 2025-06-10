@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <random>   
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -26,7 +27,19 @@ float cameraZoom = 150.0f;
 float cameraAngle = 0.0f;
 float cameraElevation = glm::radians(45.0f); 
 
+float rotationSpeed = 1.5f;
+float rotationAngle = 0.0f;
+
 int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.3f, 0.7f);
+    float duckSizeMultipliers[3] = {
+        dist(gen),
+        dist(gen),
+        dist(gen)
+    };
+
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return -1;
@@ -140,10 +153,10 @@ int main() {
     ResourceManager::loadShader("resources/shaders/basic.vert", "resources/shaders/basic.frag", nullptr, "shader");
     ResourceManager::loadTexture("resources/textures/grass.jpg", false, "grass");
     ResourceManager::loadTexture("resources/textures/water.jpg", false, "water");
-    ResourceManager::loadTexture("resources/textures/chicken.png", true, "chicken");
+    ResourceManager::loadTexture("resources/textures/duck.png", true, "duck");
 
 
-    Model duck("resources/models/chicken.obj");
+    Model duck("resources/models/duck.obj");
 
     glEnable(GL_DEPTH_TEST);
  
@@ -197,8 +210,28 @@ int main() {
         glBindVertexArray(0);
 
         glActiveTexture(GL_TEXTURE0);
-        ResourceManager::getTexture("chicken").Bind();
+        ResourceManager::getTexture("duck").Bind();
+        // test
+        rotationAngle += rotationSpeed * deltaTime;
+
+        model = glm::mat4(1.0f);
+        model = glm::rotate(model, -rotationAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(30.0f, 0.0f, 0.0f));
+        ResourceManager::getShader("shader").SetMatrix4("model", model);
         duck.Draw();
+
+        ResourceManager::getShader("shader").SetVector3f("color", glm::vec3(1.0f, 1.0f, 0.0f));
+        // Following ducks
+        for (int i = 0; i < 3; ++i) {
+            float offset = glm::radians(30.0f + i * 15.0f);
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, -rotationAngle + offset, glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::translate(model, glm::vec3(30.0f, 0.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(duckSizeMultipliers[i]));
+            ResourceManager::getShader("shader").SetMatrix4("model", model);
+            duck.Draw();
+        }
+        ResourceManager::getShader("shader").SetVector3f("color", glm::vec3(1.0f, 1.0f, 1.0f));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -222,7 +255,19 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         cameraAngle -= cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraAngle += cameraSpeed;      
+        cameraAngle += cameraSpeed; 
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        rotationSpeed += 0.5f * deltaTime;   // adjust 0.5f for sensitivity
+        if (rotationSpeed > 3.0f)             // clamp max speed
+            rotationSpeed = 3.0f;
+    }
+    // Decrease rotation speed with S
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        rotationSpeed -= 0.5f * deltaTime;   
+        if (rotationSpeed < 0.0f)             
+            rotationSpeed = 0.0f;
+    }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
