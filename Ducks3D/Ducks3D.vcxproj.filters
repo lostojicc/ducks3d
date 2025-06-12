@@ -60,5 +60,7 @@
   <ItemGroup>
     <None Include="resources\shaders\basic.frag" />
     <None Include="resources\shaders\basic.vert" />
+    <None Include="resources\shaders\signature.frag" />
+    <None Include="resources\shaders\signature.vert" />
   </ItemGroup>
 </Project>

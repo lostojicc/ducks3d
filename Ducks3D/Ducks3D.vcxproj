@@ -151,6 +151,8 @@
   <ItemGroup>
     <None Include="resources\shaders\basic.frag" />
     <None Include="resources\shaders\basic.vert" />
+    <None Include="resources\shaders\signature.frag" />
+    <None Include="resources\shaders\signature.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -156,13 +156,51 @@ int main() {
 
     glBindVertexArray(0);
 
+    float signatureQuad[] = {
+        // positions      // tex coords
+        -0.95f, -0.95f,    0.0f, 0.0f,  // Bottom-left
+        -0.50f, -0.95f,    1.0f, 0.0f,  // Bottom-right
+        -0.50f, -0.75f,    1.0f, 1.0f,  // Top-right
+        -0.95f, -0.75f,    0.0f, 1.0f   // Top-left
+    };
+
+    unsigned int signatureIndices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
+    GLuint sigVAO, sigVBO, sigEBO;
+    glGenVertexArrays(1, &sigVAO);
+    glGenBuffers(1, &sigVBO);
+    glGenBuffers(1, &sigEBO);
+
+    glBindVertexArray(sigVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, sigVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(signatureQuad), signatureQuad, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sigEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(signatureIndices), signatureIndices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+
     ResourceManager::loadShader("resources/shaders/basic.vert", "resources/shaders/basic.frag", nullptr, "shader");
+    ResourceManager::loadShader("resources/shaders/signature.vert", "resources/shaders/signature.frag", nullptr, "signatureShader");
+
     ResourceManager::loadTexture("resources/textures/grass.jpg", false, "grass");
     ResourceManager::loadTexture("resources/textures/water.jpg", false, "water");
     ResourceManager::loadTexture("resources/textures/duck.png", true, "duck");
-
+    ResourceManager::loadTexture("resources/textures/signature.png", true, "signature");
 
     Model duck("resources/models/duck.obj");
+
+    
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);        // Enable face culling
@@ -180,6 +218,21 @@ int main() {
         lastFrame = currentFrame;
 
         processInput(window);
+
+        
+        ResourceManager::getShader("signatureShader").Use();
+        glActiveTexture(GL_TEXTURE0);
+        ResourceManager::getTexture("signature").Bind();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glBindVertexArray(sigVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        glDisable(GL_BLEND);
+        
 
         glm::mat4 model = glm::mat4(1.0f);
         
