@@ -4,6 +4,8 @@
 #include <vector>
 #include <cmath>
 #include <random>   
+#include <chrono>
+#include <thread>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -19,6 +21,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 const float CAMERA_SPEED = 1.5;
+
+const int TARGET_FPS = 60;
+const std::chrono::duration<double, std::milli> FRAME_DURATION(1000.0 / TARGET_FPS);
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -166,6 +171,8 @@ int main() {
     glm::vec3 cameraPos;
 
     while (!glfwWindowShouldClose(window)) {
+        auto frameStart = std::chrono::high_resolution_clock::now();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float currentFrame = glfwGetTime();
@@ -238,6 +245,11 @@ int main() {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        auto elapsed = frameEnd - frameStart;
+        if (elapsed < FRAME_DURATION) 
+            std::this_thread::sleep_for(FRAME_DURATION - elapsed);
     }
 
     glfwDestroyWindow(window);
