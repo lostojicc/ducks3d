@@ -23,7 +23,7 @@ const float CAMERA_SPEED = 1.5;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-float cameraZoom = 150.0f;
+float cameraZoom = 100.0f;
 float cameraAngle = 0.0f;
 float cameraElevation = glm::radians(45.0f); 
 
@@ -72,16 +72,16 @@ int main() {
     glViewport(0, 0, mode->width, mode->height);
 
     float planeVertices[] = {
-        // positions          // tex coords
-        -200.0f, 0.0f, -200.0f,  0.0f, 0.0f,  // 0
-         200.0f, 0.0f, -200.0f,  20.0f, 0.0f, // 1
-         200.0f, 0.0f,  200.0f,  20.0f, 20.0f,// 2
-        -200.0f, 0.0f,  200.0f,  0.0f, 20.0f  // 3
+        // positions              // tex coords
+        -200.0f, 0.0f, -200.0f,    0.0f, 0.0f,   // 0
+         200.0f, 0.0f, -200.0f,   20.0f, 0.0f,   // 1
+         200.0f, 0.0f,  200.0f,   20.0f, 20.0f,  // 2
+        -200.0f, 0.0f,  200.0f,    0.0f, 20.0f   // 3
     };
 
     unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0
+        0, 2, 1,   // corrected CCW winding
+        0, 3, 2
     };
 
     GLuint VBO, VAO, EBO;
@@ -121,7 +121,8 @@ int main() {
     lakeVertices.push_back(tileFactor * 0.5f); // u
     lakeVertices.push_back(tileFactor * 0.5f); // v
 
-    for (int i = 0; i <= segments; ++i) {
+    // Circle perimeter vertices in CCW order
+    for (int i = segments; i >= 0; --i) {
         float angle = 2.0f * M_PI * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
@@ -159,6 +160,8 @@ int main() {
     Model duck("resources/models/duck.obj");
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);        // Enable face culling
+    glCullFace(GL_BACK);           // Cull back faces (default)
  
     glm::vec3 cameraPos;
 
