@@ -14,6 +14,4 @@ void main() {
 		discard;
 
 	FragColor = texColor;
-
-	//FragColor = vec4(1.0f, 0.0f, 0.0f, 0.0f);
 }

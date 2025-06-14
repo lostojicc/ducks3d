@@ -77,15 +77,14 @@ int main() {
     glViewport(0, 0, mode->width, mode->height);
 
     float planeVertices[] = {
-        // positions              // tex coords
-        -200.0f, 0.0f, -200.0f,    0.0f, 0.0f,   // 0
-         200.0f, 0.0f, -200.0f,   20.0f, 0.0f,   // 1
-         200.0f, 0.0f,  200.0f,   20.0f, 20.0f,  // 2
-        -200.0f, 0.0f,  200.0f,    0.0f, 20.0f   // 3
+        -200.0f, 0.0f, -200.0f,    0.0f, 0.0f,   
+         200.0f, 0.0f, -200.0f,   20.0f, 0.0f,   
+         200.0f, 0.0f,  200.0f,   20.0f, 20.0f,  
+        -200.0f, 0.0f,  200.0f,    0.0f, 20.0f   
     };
 
     unsigned int indices[] = {
-        0, 2, 1,   // corrected CCW winding
+        0, 2, 1,   
         0, 3, 2
     };
 
@@ -96,15 +95,12 @@ int main() {
 
     glBindVertexArray(VAO);
 
-    // Vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
 
-    // Element buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // Attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -116,17 +112,15 @@ int main() {
     std::vector<float> lakeVertices;
     const int segments = 50;
     const float radius = 50.0f;
-    const float y = 0.1f; // slight elevation to prevent z-fighting
-    const float tileFactor = 5.0f; // how many times texture repeats across the lake
+    const float y = 0.1f; 
+    const float tileFactor = 5.0f; 
 
-    // Center vertex
-    lakeVertices.push_back(0.0f); // x
-    lakeVertices.push_back(y);    // y
-    lakeVertices.push_back(0.0f); // z
-    lakeVertices.push_back(tileFactor * 0.5f); // u
-    lakeVertices.push_back(tileFactor * 0.5f); // v
+    lakeVertices.push_back(0.0f); 
+    lakeVertices.push_back(y);   
+    lakeVertices.push_back(0.0f); 
+    lakeVertices.push_back(tileFactor * 0.5f); 
+    lakeVertices.push_back(tileFactor * 0.5f); 
 
-    // Circle perimeter vertices in CCW order
     for (int i = segments; i >= 0; --i) {
         float angle = 2.0f * M_PI * i / segments;
         float x = radius * cos(angle);
@@ -134,8 +128,8 @@ int main() {
         lakeVertices.push_back(x);
         lakeVertices.push_back(y);
         lakeVertices.push_back(z);
-        lakeVertices.push_back(tileFactor * (0.5f + 0.5f * cos(angle))); // u
-        lakeVertices.push_back(tileFactor * (0.5f + 0.5f * sin(angle))); // v
+        lakeVertices.push_back(tileFactor * (0.5f + 0.5f * cos(angle))); 
+        lakeVertices.push_back(tileFactor * (0.5f + 0.5f * sin(angle))); 
     }
 
     GLuint lakeVAO, lakeVBO;
@@ -146,22 +140,19 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, lakeVBO);
     glBufferData(GL_ARRAY_BUFFER, lakeVertices.size() * sizeof(float), lakeVertices.data(), GL_STATIC_DRAW);
 
-    // Position attribute (3 floats)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Texture coordinates attribute (2 floats)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
     float signatureQuad[] = {
-        // positions      // tex coords
-        -0.95f, -0.95f,    0.0f, 0.0f,  // Bottom-left
-        -0.50f, -0.95f,    1.0f, 0.0f,  // Bottom-right
-        -0.50f, -0.75f,    1.0f, 1.0f,  // Top-right
-        -0.95f, -0.75f,    0.0f, 1.0f   // Top-left
+        -0.95f, -0.95f,    0.0f, 0.0f,  
+        -0.50f, -0.95f,    1.0f, 0.0f,  
+        -0.50f, -0.75f,    1.0f, 1.0f,  
+        -0.95f, -0.75f,    0.0f, 1.0f   
     };
 
     unsigned int signatureIndices[] = {
@@ -203,8 +194,8 @@ int main() {
     
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);        // Enable face culling
-    glCullFace(GL_BACK);           // Cull back faces (default)
+    glEnable(GL_CULL_FACE);        
+    glCullFace(GL_BACK);          
  
     glm::vec3 cameraPos;
 
@@ -236,7 +227,6 @@ int main() {
 
         glm::mat4 model = glm::mat4(1.0f);
         
-        // Spherical to Cartesian
         float x = sin(cameraElevation) * sin(cameraAngle) * cameraZoom;
         float y = cos(cameraElevation) * cameraZoom;
         float z = sin(cameraElevation) * cos(cameraAngle) * cameraZoom;
@@ -274,7 +264,6 @@ int main() {
 
         glActiveTexture(GL_TEXTURE0);
         ResourceManager::getTexture("duck").Bind();
-        // test
         rotationAngle += rotationSpeed * deltaTime;
 
         model = glm::mat4(1.0f);
@@ -284,7 +273,7 @@ int main() {
         duck.Draw();
 
         ResourceManager::getShader("shader").SetVector3f("color", glm::vec3(1.0f, 1.0f, 0.0f));
-        // Following ducks
+
         for (int i = 0; i < 3; ++i) {
             float offset = glm::radians(30.0f + i * 15.0f);
             glm::mat4 model = glm::mat4(1.0f);
@@ -326,11 +315,11 @@ void processInput(GLFWwindow* window) {
         cameraAngle += cameraSpeed; 
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        rotationSpeed += 0.5f * deltaTime;   // adjust 0.5f for sensitivity
-        if (rotationSpeed > 3.0f)             // clamp max speed
+        rotationSpeed += 0.5f * deltaTime;   
+        if (rotationSpeed > 3.0f)             
             rotationSpeed = 3.0f;
     }
-    // Decrease rotation speed with S
+
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         rotationSpeed -= 0.5f * deltaTime;   
         if (rotationSpeed < 0.0f)             
