@@ -16,7 +16,7 @@ This project requires the following DLL file to run:
 ## Running the build
 
 1. Build the project as usual.
-2. Copy `assimp-vc143-mt.dll` from the `Ducks3D/lib/libs/` folder into the same folder as the executable (e.g., `/build/Debug/`).
-3. Run the executable.
+2. Copy `assimp-vc143-mt.dll` from the `Ducks3D/lib/libs/` folder into the same folder as the executable (e.g., `/x64/Debug/`).
+3. Run the program with/without debugging from Visual Studio.
 
 **Note:** The `.dll` must be in the executable folder or accessible via your system PATH for the application to run correctly.
