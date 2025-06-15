@@ -1,3 +1,10 @@
+# Ducks3D
+
+This is a simple project created for my Computer Graphics class at university
+demonstrating 3D rendering using the OpenGL API.
+
+![image](https://github.com/user-attachments/assets/71b911c1-e2af-487e-bc46-5ffbee37e969)
+
 # Project Setup
 
 ## Dependencies
